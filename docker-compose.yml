@@ -46,6 +46,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./tests:/app/tests
+      - ./scripts:/app/scripts:ro
       - ./pyproject.toml:/app/pyproject.toml:ro
     depends_on:
       postgres:
