@@ -6,7 +6,7 @@ from src.db.models import Transaction, UserTransactionSummary
 def test_transaction_model_structure():
     """Verify Transaction model table name, primary key, and column definitions."""
     assert Transaction.__tablename__ == "transactions"
-    
+
     # Verify Composite Primary Key (transaction_id, transaction_date)
     pk_cols = [col.name for col in Transaction.__table__.primary_key.columns]
     assert "transaction_id" in pk_cols

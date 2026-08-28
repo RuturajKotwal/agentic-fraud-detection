@@ -25,16 +25,14 @@ class Base(DeclarativeBase):
 
 class Transaction(Base):
     """Partitioned transactions model.
-    
+
     Partitioned by RANGE on transaction_date.
     Composite PK: (transaction_id, transaction_date).
     """
 
     __tablename__ = "transactions"
 
-    transaction_id: Mapped[UUID] = mapped_column(
-        PG_UUID(as_uuid=True), nullable=False
-    )
+    transaction_id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), nullable=False)
     user_id: Mapped[int] = mapped_column(BigInteger, nullable=False, index=True)
     transaction_date: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, index=True
@@ -53,9 +51,7 @@ class Transaction(Base):
         DateTime, server_default=func.now(), nullable=False
     )
 
-    __table_args__ = (
-        PrimaryKeyConstraint("transaction_id", "transaction_date"),
-    )
+    __table_args__ = (PrimaryKeyConstraint("transaction_id", "transaction_date"),)
 
 
 class UserTransactionSummary(Base):
@@ -80,15 +76,11 @@ class UserTransactionSummary(Base):
     frequent_merchant_categories: Mapped[list[str]] = mapped_column(
         ARRAY(Text), default=list, nullable=False
     )
-    frequent_countries: Mapped[list[str]] = mapped_column(
-        ARRAY(Text), default=list, nullable=False
-    )
+    frequent_countries: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list, nullable=False)
     first_transaction_date: Mapped[datetime.datetime | None] = mapped_column(
         DateTime, nullable=True
     )
-    last_transaction_date: Mapped[datetime.datetime | None] = mapped_column(
-        DateTime, nullable=True
-    )
+    last_transaction_date: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=True)
     updated_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
     )
