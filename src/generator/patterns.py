@@ -158,8 +158,8 @@ def inject_velocity_fraud(
                 if user_profile.known_devices
                 else None,
                 "ip_country": user_profile.home_country,
-                "is_flagged": False,
-                "flag_reason": None,
+                "is_flagged": True,
+                "flag_reason": FraudPatternType.VELOCITY.value,
                 "fraud_score": None,
                 "created_at": tx_time,
             }
@@ -194,8 +194,8 @@ def inject_geographic_impossibility(
         "card_present": True,
         "device_id": rng.choice(user_profile.known_devices) if user_profile.known_devices else None,
         "ip_country": user_profile.home_country,
-        "is_flagged": False,
-        "flag_reason": None,
+        "is_flagged": True,
+        "flag_reason": FraudPatternType.GEOGRAPHIC_IMPOSSIBILITY.value,
         "fraud_score": None,
         "created_at": tx1_time,
     }
@@ -214,8 +214,8 @@ def inject_geographic_impossibility(
         "card_present": True,  # Physical card present on another continent
         "device_id": hashlib.sha256(f"foreign_pos_{uuid.uuid4()}".encode()).hexdigest()[:16],
         "ip_country": foreign_country,
-        "is_flagged": False,
-        "flag_reason": None,
+        "is_flagged": True,
+        "flag_reason": FraudPatternType.GEOGRAPHIC_IMPOSSIBILITY.value,
         "fraud_score": None,
         "created_at": tx2_time,
     }
@@ -247,8 +247,8 @@ def inject_amount_deviation(
         "card_present": False,
         "device_id": rng.choice(user_profile.known_devices) if user_profile.known_devices else None,
         "ip_country": user_profile.home_country,
-        "is_flagged": False,
-        "flag_reason": None,
+        "is_flagged": True,
+        "flag_reason": FraudPatternType.AMOUNT_DEVIATION.value,
         "fraud_score": None,
         "created_at": tx_time,
     }
@@ -277,8 +277,8 @@ def inject_new_device_high_amount(
         "card_present": False,
         "device_id": new_device_id,
         "ip_country": user_profile.home_country,
-        "is_flagged": False,
-        "flag_reason": None,
+        "is_flagged": True,
+        "flag_reason": FraudPatternType.NEW_DEVICE_HIGH_AMOUNT.value,
         "fraud_score": None,
         "created_at": tx_time,
     }
@@ -307,8 +307,8 @@ def inject_round_number_structuring(
         "card_present": False,
         "device_id": rng.choice(user_profile.known_devices) if user_profile.known_devices else None,
         "ip_country": user_profile.home_country,
-        "is_flagged": False,
-        "flag_reason": None,
+        "is_flagged": True,
+        "flag_reason": FraudPatternType.ROUND_NUMBER_STRUCTURING.value,
         "fraud_score": None,
         "created_at": tx_time,
     }
