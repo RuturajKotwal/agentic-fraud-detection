@@ -1,8 +1,7 @@
 import os
 import time
+
 import psycopg
-from collections import defaultdict
-from typing import Any
 
 from src.rules.engine import evaluate_transaction
 
@@ -15,8 +14,7 @@ def run_batch_job():
     print("[+] Starting Fraud Engine Batch Job...")
     start_time = time.time()
     
-    with psycopg.connect(DB_URL) as conn:
-        with conn.cursor() as cur:
+    with psycopg.connect(DB_URL) as conn, conn.cursor() as cur:
             # 1. Load user summaries
             print("[+] Loading user summaries...")
             cur.execute("SELECT user_id, avg_amount, std_amount FROM user_transaction_summary")

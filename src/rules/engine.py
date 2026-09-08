@@ -1,5 +1,4 @@
 import datetime
-from decimal import Decimal
 from typing import Any
 
 # Threshold for flagging a transaction
@@ -90,11 +89,7 @@ def check_geographic_impossibility(tx: dict[str, Any], user_history: list[dict[s
         if past_tx["transaction_date"] < window_start:
             break
         if past_tx.get("card_present"):
-            if past_tx["merchant_country"] != current_country:
-                return True
-            else:
-                # Same country, so no impossibility for this jump
-                return False
+            return past_tx["merchant_country"] != current_country
                 
     return False
 
@@ -146,7 +141,4 @@ def check_round_number_structuring(tx: dict[str, Any]) -> bool:
         
     # Structured amounts injected in synthetic data: e.g. 9900, 4950, 2950, etc.
     # Check if amount is a whole number and divisible by 50
-    if amount % 50 == 0:
-        return True
-        
-    return False
+    return amount % 50 == 0

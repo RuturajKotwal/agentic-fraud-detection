@@ -1,14 +1,14 @@
 import datetime
-from decimal import Decimal
 
 from src.rules.engine import (
-    evaluate_transaction,
-    check_velocity,
-    check_geographic_impossibility,
     check_amount_deviation,
+    check_geographic_impossibility,
     check_new_device_high_amount,
     check_round_number_structuring,
+    check_velocity,
+    evaluate_transaction,
 )
+
 
 def test_check_velocity():
     now = datetime.datetime.now(datetime.UTC)

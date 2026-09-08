@@ -1,7 +1,7 @@
 import os
-import psycopg
 from collections import defaultdict
-from typing import Any
+
+import psycopg
 
 from src.rules.engine import evaluate_transaction
 
@@ -13,8 +13,7 @@ DB_URL = os.getenv(
 def run_evaluation():
     print("[+] Starting Engine Evaluation against Ground Truth...")
     
-    with psycopg.connect(DB_URL) as conn:
-        with conn.cursor() as cur:
+    with psycopg.connect(DB_URL) as conn, conn.cursor() as cur:
             # Load user summaries
             cur.execute("SELECT user_id, avg_amount, std_amount FROM user_transaction_summary")
             user_summaries = {}
