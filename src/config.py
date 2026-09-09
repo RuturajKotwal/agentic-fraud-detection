@@ -12,18 +12,18 @@ class Settings(BaseSettings):
 
     # PostgreSQL Core / Read-Write
     POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: int = 5432
+    POSTGRES_PORT: int = 5433
     POSTGRES_DB: str = "fraud_detection"
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres"
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/fraud_detection"
-    DATABASE_SYNC_URL: str = "postgresql://postgres:postgres@localhost:5432/fraud_detection"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5433/fraud_detection"
+    DATABASE_SYNC_URL: str = "postgresql://postgres:postgres@localhost:5433/fraud_detection"
 
     # Dedicated Read-Only DB Role for Agent SQL execution
     AGENT_DB_USER: str = "agent_reader"
     AGENT_DB_PASSWORD: str = "agent_reader_password"
     AGENT_DATABASE_URL: str = (
-        "postgresql+asyncpg://agent_reader:agent_reader_password@localhost:5432/fraud_detection"
+        "postgresql+asyncpg://agent_reader:agent_reader_password@localhost:5433/fraud_detection"
     )
 
     # LLM Settings

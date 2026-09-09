@@ -18,7 +18,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: fraud_detection
         ports:
-          - 5432:5432
+          - 5433:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -48,11 +48,11 @@ jobs:
         env:
           ENVIRONMENT: test
           POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
+          POSTGRES_PORT: 5433
           POSTGRES_DB: fraud_detection
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/fraud_detection
-          DATABASE_SYNC_URL: postgresql://postgres:postgres@localhost:5432/fraud_detection
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5433/fraud_detection
+          DATABASE_SYNC_URL: postgresql://postgres:postgres@localhost:5433/fraud_detection
         run: |
           pytest tests/ -v
