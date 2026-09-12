@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str | None = None
     LLM_MODEL: str = "claude-3-5-sonnet-20241022"
 
+    # Rules Engine Geographic Impossibility Settings
+    GEO_IMPOSSIBILITY_MODE: str = "speed"  # "speed" or "fixed_window"
+    GEO_MAX_SPEED_KMH: float = 900.0
+    GEO_FIXED_WINDOW_HOURS: float = 8.0
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

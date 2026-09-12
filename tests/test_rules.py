@@ -7,13 +7,14 @@ from src.rules.engine import (
     check_round_number_structuring,
     check_velocity,
     evaluate_transaction,
+    get_country_distance,
 )
 
 
 def test_check_velocity():
     now = datetime.datetime.now(datetime.UTC)
     tx = {"transaction_id": "tx5", "transaction_date": now, "amount": 100}
-    
+
     # 3 past tx within 3 minutes = 4 total, should trigger
     history_trigger = [
         {"transaction_id": "tx1", "transaction_date": now - datetime.timedelta(minutes=2)},
@@ -34,19 +35,19 @@ def test_check_velocity():
 def test_check_geographic_impossibility():
     now = datetime.datetime.now(datetime.UTC)
     tx = {
-        "transaction_id": "tx2", 
-        "transaction_date": now, 
+        "transaction_id": "tx2",
+        "transaction_date": now,
         "merchant_country": "US",
-        "card_present": True
+        "card_present": True,
     }
-    
-    # Previous card-present tx in different country within 8 hours
+
+    # Previous card-present tx in different country within 2 hours (US -> JP, >5000 km/h)
     history_trigger = [
         {
-            "transaction_id": "tx1", 
+            "transaction_id": "tx1",
             "transaction_date": now - datetime.timedelta(hours=2),
             "merchant_country": "JP",
-            "card_present": True
+            "card_present": True,
         }
     ]
     assert check_geographic_impossibility(tx, history_trigger) == True
@@ -58,22 +59,67 @@ def test_check_geographic_impossibility():
     # Previous was in same country, should not trigger
     history_pass = [
         {
-            "transaction_id": "tx1", 
+            "transaction_id": "tx1",
             "transaction_date": now - datetime.timedelta(hours=2),
             "merchant_country": "US",
-            "card_present": True
+            "card_present": True,
         }
     ]
     assert check_geographic_impossibility(tx, history_pass) == False
 
 
+def test_geographic_impossibility_speed_vs_fixed_window():
+    now = datetime.datetime.now(datetime.UTC)
+    tx = {
+        "transaction_id": "tx2",
+        "transaction_date": now,
+        "merchant_country": "FR",
+        "card_present": True,
+    }
+
+    # Realistic travel: Germany to France in 4 hours (~816 km -> ~204 km/h)
+    history_realistic = [
+        {
+            "transaction_id": "tx1",
+            "transaction_date": now - datetime.timedelta(hours=4),
+            "merchant_country": "DE",
+            "card_present": True,
+        }
+    ]
+
+    # In speed mode: plausible travel by train/flight (<= 900 km/h), so NOT flagged
+    assert check_geographic_impossibility(tx, history_realistic, mode="speed") == False
+
+    # In legacy fixed_window mode: different country within 8h window -> FLAGGED
+    assert check_geographic_impossibility(tx, history_realistic, mode="fixed_window") == True
+
+    # Impossible travel: Germany to France in 20 minutes (~816 km in 0.33h -> ~2450 km/h)
+    history_impossible = [
+        {
+            "transaction_id": "tx1",
+            "transaction_date": now - datetime.timedelta(minutes=20),
+            "merchant_country": "DE",
+            "card_present": True,
+        }
+    ]
+    assert check_geographic_impossibility(tx, history_impossible, mode="speed") == True
+    assert check_geographic_impossibility(tx, history_impossible, mode="fixed_window") == True
+
+
+def test_get_country_distance():
+    assert get_country_distance("US", "US") == 0.0
+    assert get_country_distance("FR", "DE") == 816.0
+    assert get_country_distance("de", "fr") == 816.0
+    assert get_country_distance("US", "JP") == 10150.0
+
+
 def test_check_amount_deviation():
     tx = {"amount": 800.0}
     user_summary = {"avg_amount": 50.0, "std_amount": 10.0}
-    
+
     # z_score = (800 - 50) / 10 = 75 (> 6) -> True
     assert check_amount_deviation(tx, user_summary) == True
-    
+
     tx_normal = {"amount": 70.0}
     # z_score = (70 - 50) / 10 = 2 (< 6) -> False
     assert check_amount_deviation(tx_normal, user_summary) == False
@@ -83,10 +129,10 @@ def test_check_new_device_high_amount():
     tx = {
         "transaction_id": "tx2",
         "amount": 1000.0,
-        "device_id": "device_new"
+        "device_id": "device_new",
     }
     user_summary = {"avg_amount": 100.0}
-    
+
     history_unseen = [
         {"transaction_id": "tx1", "device_id": "device_old"}
     ]
@@ -113,29 +159,28 @@ def test_evaluate_transaction_combined():
     tx = {
         "transaction_id": "tx2",
         "transaction_date": now,
-        "amount": 4950.0, # Triggers round number (0.6)
+        "amount": 4950.0,  # Triggers round number (0.6)
         "merchant_country": "US",
         "card_present": True,
-        "device_id": "device_new" # Triggers new device high amount (0.8)
+        "device_id": "device_new",  # Triggers new device high amount (0.8)
     }
     history = [
         {
             "transaction_id": "tx1",
             "transaction_date": now - datetime.timedelta(minutes=30),
-            "merchant_country": "JP", # Triggers geo impossibility (0.9)
+            "merchant_country": "JP",  # Triggers geo impossibility (0.9)
             "card_present": True,
-            "device_id": "device_old"
+            "device_id": "device_old",
         }
     ]
     summary = {"avg_amount": 50.0, "std_amount": 10.0}
-    # amount deviation z-score = (4950-50)/10 = 490 > 6 (0.7)
-    
+
     # Combined should trigger multiple rules
     is_flagged, flag_reason, fraud_score = evaluate_transaction(tx, history, summary)
-    
+
     assert is_flagged == True
-    assert fraud_score == 1.0 # capped at 1.0
-    
+    assert fraud_score == 1.0  # capped at 1.0
+
     reasons = flag_reason.split(",")
     assert "geographic_impossibility" in reasons
     assert "amount_deviation" in reasons
