@@ -21,7 +21,7 @@ def build_parser() -> argparse.ArgumentParser:
         "-n",
         "--count",
         type=int,
-        default=100_000,
+        default=10_000_000,
         help="Total number of transaction records to generate.",
     )
     parser.add_argument(

@@ -9,9 +9,9 @@ from decimal import Decimal
 class GeneratorConfig:
     """Settings controlling synthetic dataset creation and fraud pattern injection."""
 
-    total_records: int = 100_000
+    total_records: int = 10_000_000
     fraud_rate: float = 0.02  # 2% injection rate (default in range 1-3%)
-    num_users: int = 5_000
+    num_users: int = 100_000
     start_date: datetime.datetime = field(
         default_factory=lambda: datetime.datetime(2024, 1, 1, 0, 0, 0, tzinfo=datetime.UTC)
     )
