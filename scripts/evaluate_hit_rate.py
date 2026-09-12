@@ -103,7 +103,6 @@ def run_evaluation(history_window: int = 50, geo_mode: str = "speed") -> None:
                     print(f"    ... processed {processed:,} rows", flush=True)
 
     elapsed = time.time() - start_time
-    print("")
     print("=" * 50)
     print("  ENGINE EVALUATION RESULTS")
     print("=" * 50)
@@ -127,13 +126,11 @@ def run_evaluation(history_window: int = 50, geo_mode: str = "speed") -> None:
     print(f"Execution Runtime:   {elapsed:.2f}s")
 
     if fn > 0:
-        print("")
         print("Missed Fraud Patterns (False Negatives):")
         for reason, count in missed_patterns.items():
             print(f"  - {reason}: {count:,}")
 
     if fp > 0:
-        print("")
         print("False Positive Trigger Reasons:")
         for reason, count in false_positive_reasons.items():
             print(f"  - {reason}: {count:,}")
