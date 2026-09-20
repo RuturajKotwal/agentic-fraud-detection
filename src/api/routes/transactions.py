@@ -87,7 +87,7 @@ async def investigate_transaction(
         raise HTTPException(
             status_code=500,
             detail=f"Agent investigation failed: {exc}",
-        )
+        ) from exc
 
     return {
         "transaction_id": transaction_id,

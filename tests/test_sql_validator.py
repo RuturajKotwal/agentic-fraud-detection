@@ -13,7 +13,6 @@ import pytest
 
 from src.agent.sql_validator import BLOCKED_KEYWORDS, LIMIT_CAP, validate_sql
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -245,7 +244,7 @@ class TestNonSelectRejection:
         # with SELECT.  A CTE starting with WITH would be rejected.
         # This test documents that behaviour explicitly so the team can decide
         # whether to relax the rule later.
-        ok, result = validate_sql(
+        ok, _result = validate_sql(
             "WITH cte AS (SELECT id FROM transactions) SELECT * FROM cte"
         )
         # WITH does not start with SELECT — expect rejection under current rules.

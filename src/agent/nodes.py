@@ -8,6 +8,7 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 
 from src.agent.db import execute_agent_query
 from src.agent.llm import (
@@ -233,7 +234,7 @@ async def execution_node(state: AgentState) -> dict[str, Any]:
             "execution_error": None,
             "queries_run": queries_run,
         }
-    except Exception as exc:
+    except (SQLAlchemyError, TimeoutError, OSError, RuntimeError, ValueError, TypeError) as exc:
         err_msg = str(exc)
         if queries_run:
             queries_run[-1]["status"] = "execution_failed"

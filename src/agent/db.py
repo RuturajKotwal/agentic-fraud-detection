@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import datetime
-from decimal import Decimal
 import time
+from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import text
+
 from src.db.session import agent_session_factory
 
 

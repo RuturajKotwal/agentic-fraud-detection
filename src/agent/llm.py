@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from typing import Any
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from src.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 def get_agent_llm() -> Any | None:
@@ -25,8 +28,8 @@ def get_agent_llm() -> Any | None:
                 api_key=settings.ANTHROPIC_API_KEY,
                 temperature=0.0,
             )
-        except Exception:
-            pass
+        except (ImportError, ValueError, RuntimeError) as exc:
+            logger.warning("Failed to initialize Anthropic LLM: %s", exc)
 
     if settings.OPENAI_API_KEY:
         try:
@@ -38,8 +41,8 @@ def get_agent_llm() -> Any | None:
                 api_key=settings.OPENAI_API_KEY,
                 temperature=0.0,
             )
-        except Exception:
-            pass
+        except (ImportError, ValueError, RuntimeError) as exc:
+            logger.warning("Failed to initialize OpenAI LLM: %s", exc)
 
     return None
 
@@ -226,5 +229,6 @@ async def summarize_investigation(
         summary = str(data.get("summary", "Anomaly investigation completed."))
         confidence = float(data.get("confidence", 0.85))
         return summary, min(1.0, max(0.0, confidence))
-    except Exception:
+    except (json.JSONDecodeError, ValueError, KeyError, TypeError, AttributeError) as exc:
+        logger.warning("Failed to parse LLM JSON summary response: %s", exc)
         return content, 0.80
