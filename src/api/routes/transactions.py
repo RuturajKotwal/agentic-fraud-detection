@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.agent.graph import run_investigation
 from src.api.schemas import InvestigationResponse, TransactionResponse
 from src.db.models import Transaction
 from src.db.session import get_db
@@ -59,10 +60,10 @@ async def get_transaction(
     stmt = select(Transaction).where(Transaction.transaction_id == transaction_id)
     result = await session.execute(stmt)
     transaction = result.scalar_one_or_none()
-    
+
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
-        
+
     return transaction
 
 
@@ -71,38 +72,33 @@ async def investigate_transaction(
     transaction_id: UUID,
     session: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
-    """Stub endpoint returning a realistic LangGraph investigation contract."""
-    # Query the transaction to get actual flagged reasons
+    """Execute LangGraph data analyst agent workflow to investigate flagged transaction."""
+    # Verify the transaction exists
     stmt = select(Transaction).where(Transaction.transaction_id == transaction_id)
     result = await session.execute(stmt)
     transaction = result.scalar_one_or_none()
-    
+
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
-        
-    # Extract rules that flagged this transaction
-    flagged_rules = []
-    if transaction.flag_reason:
-        flagged_rules = [r.strip() for r in transaction.flag_reason.split(",")]
-        
+
+    try:
+        agent_state = await run_investigation(transaction_id)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Agent investigation failed: {exc}",
+        )
+
     return {
         "transaction_id": transaction_id,
-        "status": "completed",
-        "summary": "Agent detected multiple high-value transactions occurring across international borders within an impossible timeframe, corroborating the rules engine flag.",
-        "confidence": 0.87,
-        "queries_run": [
-            {
-                "step": 1,
-                "purpose": "Check user's recent international transaction history",
-                "sql": f"SELECT merchant_country, transaction_date FROM transactions WHERE user_id = {transaction.user_id} ORDER BY transaction_date DESC LIMIT 5",
-                "row_count": 5,
-                "execution_time_ms": 12
-            }
-        ],
-        "context": {
-            "user_avg_transaction_amount": 142.50,
-            "user_transaction_count_30d": 8,
-            "flagged_by_rules": flagged_rules
-        },
-        "generated_at": datetime.datetime.now(datetime.UTC).isoformat()
+        "status": agent_state.get("status", "completed"),
+        "summary": agent_state.get("summary", "Investigation completed."),
+        "confidence": agent_state.get("confidence", 0.85),
+        "queries_run": agent_state.get("queries_run", []),
+        "context": agent_state.get("context", {
+            "user_avg_transaction_amount": 0.0,
+            "user_transaction_count_30d": 0,
+            "flagged_by_rules": [],
+        }),
+        "generated_at": datetime.datetime.now(datetime.UTC),
     }

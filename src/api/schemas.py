@@ -30,16 +30,20 @@ class TransactionResponse(BaseModel):
 
 
 class QueryRun(BaseModel):
-    """Represents a single SQL query executed by the LangGraph agent."""
+    """Represents a single SQL query executed or attempted by the LangGraph agent."""
+
     step: int
     purpose: str
     sql: str
-    row_count: int
-    execution_time_ms: int
+    row_count: int = 0
+    execution_time_ms: int = 0
+    status: str = "executed"
+    note: str | None = None
 
 
 class InvestigationContext(BaseModel):
     """Contextual data drawn from the rules engine or user history."""
+
     user_avg_transaction_amount: float
     user_transaction_count_30d: int
     flagged_by_rules: list[str]
