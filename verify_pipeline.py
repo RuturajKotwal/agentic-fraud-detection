@@ -4,10 +4,10 @@ Runs inside the docker container: docker exec -e PYTHONPATH=/app fraud_detection
 """
 import asyncio
 import json
-import sys
 import time
 from unittest.mock import patch
 from uuid import uuid4
+
 
 # ============================================================
 # TASK 2: CREDENTIAL SEPARATION GREP (static analysis)
@@ -141,7 +141,7 @@ async def task1_and_4_verify_retry_and_queries_run():
     assert attempts == 3, f"FAIL: Expected exactly 3 attempts, got {attempts}"
     assert status == "completed", f"FAIL: Expected 'completed' status, got {status}"
     assert len(queries_run) == 3, f"FAIL: Expected 3 queries in queries_run, got {len(queries_run)}"
-    print(f"\n  [PASS] Loop terminated after exactly 3 attempts, no crash, status=completed")
+    print("\n  [PASS] Loop terminated after exactly 3 attempts, no crash, status=completed")
 
     print("\n  [Task 4] All rejected attempts visible in queries_run:")
     for q in queries_run:
@@ -193,7 +193,7 @@ async def task1_and_4_verify_retry_and_queries_run():
 
     print(f"  queries_run[0]: step={qr2[0]['step']} status={qr2[0]['status']} note='{qr2[0]['note'][:60]}'")
     print(f"  queries_run[1]: step={qr2[1]['step']} status={qr2[1]['status']} row_count={qr2[1]['row_count']} exec_ms={qr2[1]['execution_time_ms']}")
-    print(f"\n  [PASS] queries_run shows rejected attempt (step 1) AND successful execution (step 2)")
+    print("\n  [PASS] queries_run shows rejected attempt (step 1) AND successful execution (step 2)")
     print("  [PASS] Validation layer existence is VISIBLE and AUDITABLE in the output, not just trusted")
 
 
@@ -213,7 +213,7 @@ async def task3_three_test_cases():
         # --- CASE 1: Clear TRUE POSITIVE - Round Number Structuring ---
         # 9850 EUR transaction for user 4921 whose avg is ~210 EUR
         tx_tp = "7b13ca7b-8dc2-4591-b01f-108fa361a57b"
-        print(f"\n[CASE 1] True Positive - round_number_structuring (9850 EUR vs ~210 EUR avg)")
+        print("\n[CASE 1] True Positive - round_number_structuring (9850 EUR vs ~210 EUR avg)")
         print(f"  Transaction: {tx_tp}")
         resp1 = await client.post(f"/transactions/{tx_tp}/investigate")
         assert resp1.status_code == 200, f"Expected 200, got {resp1.status_code}: {resp1.text}"
@@ -229,7 +229,7 @@ async def task3_three_test_cases():
         # The pairs occur repeatedly (24 geo flags), suggesting a business traveler not fraud
         # Using the Jan 31 2024 FR flag (18 min gap, ~8900 km = ~29700 km/h, flagged at speed)
         tx_fp = "1a63bb00-ca94-480e-b1e9-2cd3ee5ea9a2"  # FR flagged, same day as US transaction
-        print(f"\n[CASE 2] Known False Positive - geo_impossibility (User 1893, repeat international pattern)")
+        print("\n[CASE 2] Known False Positive - geo_impossibility (User 1893, repeat international pattern)")
         print(f"  Transaction: {tx_fp}")
         resp2 = await client.post(f"/transactions/{tx_fp}/investigate")
         assert resp2.status_code == 200, f"Expected 200, got {resp2.status_code}: {resp2.text}"
@@ -244,12 +244,12 @@ async def task3_three_test_cases():
         # User 3262: 3 transactions in 4 min (01:50, 01:51, 01:54) - velocity rule requires 4 in 3 min
         # Rules completely missed this pattern; agent should reason about it from query
         tx_fn = "1731888d-fe8b-4054-b2c6-adb3e8b8d47a"  # 3rd of the 3 rapid-fire transactions
-        print(f"\n[CASE 3] False Negative - velocity pattern missed by rules (User 3262, 3 txns in 4 min)")
+        print("\n[CASE 3] False Negative - velocity pattern missed by rules (User 3262, 3 txns in 4 min)")
         print(f"  Transaction: {tx_fn}")
         resp3 = await client.post(f"/transactions/{tx_fn}/investigate")
         # This tx is NOT flagged so we expect 404
         if resp3.status_code == 404:
-            print(f"  [EXPECTED] 404 - this transaction is not flagged, agent can't be invoked without a flag")
+            print("  [EXPECTED] 404 - this transaction is not flagged, agent can't be invoked without a flag")
             print("  Confirming rules missed this pattern by looking at the raw data:")
             print("    User 3262: 3 txns in 4 minutes (01:50, 01:51, 01:54) - velocity rule threshold: 4 in 3 min")
             print("    Rule requires: >=4 transactions within 3 minutes")
