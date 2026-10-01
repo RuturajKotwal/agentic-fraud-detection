@@ -288,6 +288,9 @@ async def task3_three_test_cases():
 
     return results
 
+def _write_transcripts(transcripts):
+    with open("/app/verification_transcripts.json", "w") as f:
+        json.dump(transcripts, f, indent=2, default=str)
 
 async def main():
     # Task 2 (synchronous grep / static analysis)
@@ -299,9 +302,8 @@ async def main():
     # Task 3 (live API calls)
     transcripts = await task3_three_test_cases()
 
-    # Save transcripts
-    with open("/app/verification_transcripts.json", "w") as f:
-        json.dump(transcripts, f, indent=2, default=str)
+    # Save transcripts asynchronously via a thread pool
+    await asyncio.to_thread(_write_transcripts(transcripts))
 
     print("\n" + "=" * 70)
     print("ALL FOUR VERIFICATION TASKS COMPLETE")
