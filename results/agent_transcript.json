@@ -1,0 +1,84 @@
+{
+    "true_positive": {
+        "transaction_id": "7b13ca7b-8dc2-4591-b01f-108fa361a57b",
+        "status": "completed",
+        "summary": "The transaction is anomalous due to its significantly high amount of $9850.00 compared to the user's average transaction amount of $461.60. Additionally, the transaction has been flagged for round number structuring, which indicates a potential pattern of fraudulent behavior. The user's transaction history shows no prior transactions of this magnitude, further supporting the suspicion of fraud.",
+        "confidence": 0.85,
+        "queries_run": [
+            {
+                "step": 1,
+                "purpose": "What are the user's previous transaction amounts, dates, and merchant categories, particularly focusing on any transactions close to the flagged amount of 9850.00 USD?",
+                "sql": "SELECT transaction_id, transaction_date, amount, merchant_category FROM transactions WHERE user_id = 4921 AND ABS(amount - 9850.00) <= 1000 ORDER BY transaction_date DESC LIMIT 500",
+                "row_count": 7,
+                "execution_time_ms": 688,
+                "status": "executed",
+                "note": "Validation passed"
+            }
+        ],
+        "context": {
+            "user_avg_transaction_amount": 461.6,
+            "user_transaction_count_30d": 24,
+            "flagged_by_rules": [
+                "round_number_structuring"
+            ]
+        },
+        "generated_at": "2026-10-01T20:21:14.959571Z"
+    },
+    "false_positive": {
+        "transaction_id": "1a63bb00-ca94-480e-b1e9-2cd3ee5ea9a2",
+        "status": "completed",
+        "summary": "The transaction is anomalous due to a significant deviation from the user's average transaction amount of $77.40, with this transaction being $874.42. Additionally, it is flagged for geographic impossibility, suggesting that the user may not be in the country where the transaction occurred, which raises further suspicion.",
+        "confidence": 0.85,
+        "queries_run": [
+            {
+                "step": 1,
+                "purpose": "What are the user's previous transaction amounts, dates, and merchant categories, particularly focusing on any transactions made in France or involving luxury items?",
+                "sql": "SELECT transaction_id, transaction_date, amount, merchant_category FROM transactions WHERE user_id = 1893 AND (merchant_country = 'France' OR merchant_category LIKE '%luxury%') ORDER BY transaction_date DESC LIMIT 500",
+                "row_count": 63,
+                "execution_time_ms": 1902,
+                "status": "executed",
+                "note": "Validation passed"
+            }
+        ],
+        "context": {
+            "user_avg_transaction_amount": 77.4,
+            "user_transaction_count_30d": 22,
+            "flagged_by_rules": [
+                "geographic_impossibility"
+            ]
+        },
+        "generated_at": "2026-10-01T20:21:21.822837Z"
+    },
+    "false_negative": {
+        "transaction_id": "1731888d-fe8b-4054-b2c6-adb3e8b8d47a",
+        "status": "completed",
+        "summary": "The transaction of $138.71 is anomalous as it is significantly lower than the user's average transaction amount of $321.53. This deviation from the user's typical spending pattern raises concerns about its legitimacy, especially considering the absence of frequent merchant categories and the user's overall transaction history.",
+        "confidence": 0.85,
+        "queries_run": [
+            {
+                "step": 1,
+                "purpose": "What are the user's previous transaction amounts, dates, and merchant categories to identify any patterns or anomalies leading up to this flagged transaction? (Rejected by validation: Query rejected: semicolons are not permitted (stacked/multiple statements disallowed).)",
+                "sql": "SELECT transaction_id, transaction_date, amount, merchant_category FROM transactions WHERE user_id = 3262 AND is_flagged = FALSE ORDER BY transaction_date DESC;",
+                "row_count": 0,
+                "execution_time_ms": 0,
+                "status": "rejected",
+                "note": "Rejected by validation: Query rejected: semicolons are not permitted (stacked/multiple statements disallowed)."
+            },
+            {
+                "step": 2,
+                "purpose": "What are the user's previous transaction amounts, dates, and merchant categories to identify any patterns or anomalies?",
+                "sql": "SELECT transaction_id, transaction_date, amount, merchant_category FROM transactions WHERE user_id = 3262 ORDER BY transaction_date DESC LIMIT 500",
+                "row_count": 500,
+                "execution_time_ms": 155,
+                "status": "executed",
+                "note": "Validation passed"
+            }
+        ],
+        "context": {
+            "user_avg_transaction_amount": 321.53,
+            "user_transaction_count_30d": 18,
+            "flagged_by_rules": []
+        },
+        "generated_at": "2026-10-01T20:21:29.451498Z"
+    }
+}

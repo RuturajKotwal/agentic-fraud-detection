@@ -1,0 +1,75 @@
+{
+    "true_positive": {
+        "transaction_id": "7b13ca7b-8dc2-4591-b01f-108fa361a57b",
+        "status": "completed",
+        "summary": "Agent investigated flagged transaction 7b13ca7b-8dc2-4591-b01f-108fa361a57b for user 4921. The transaction of 9850.00 USD was flagged by [round_number_structuring]. Historical query examined 5 previous transactions against user average of 461.60. Corroborating behavioral patterns confirm significant divergence from typical activity.",
+        "confidence": 0.88,
+        "queries_run": [
+            {
+                "step": 1,
+                "purpose": "Query the last 5 transactions for user 4921 ordered by date descending to establish baseline behavioral context.",
+                "sql": "SELECT transaction_id, transaction_date, amount, merchant_country, ip_country FROM transactions WHERE user_id = 4921 ORDER BY transaction_date DESC LIMIT 5",
+                "row_count": 5,
+                "execution_time_ms": 89,
+                "status": "executed",
+                "note": "Validation passed"
+            }
+        ],
+        "context": {
+            "user_avg_transaction_amount": 461.6,
+            "user_transaction_count_30d": 24,
+            "flagged_by_rules": [
+                "round_number_structuring"
+            ]
+        },
+        "generated_at": "2026-10-01T20:26:37.662966Z"
+    },
+    "false_positive": {
+        "transaction_id": "1a63bb00-ca94-480e-b1e9-2cd3ee5ea9a2",
+        "status": "completed",
+        "summary": "Agent investigated flagged transaction 1a63bb00-ca94-480e-b1e9-2cd3ee5ea9a2 for user 1893. The transaction of 874.42 USD was flagged by [geographic_impossibility]. Historical query examined 5 previous transactions against user average of 77.40. Corroborating behavioral patterns confirm significant divergence from typical activity.",
+        "confidence": 0.88,
+        "queries_run": [
+            {
+                "step": 1,
+                "purpose": "Query the last 5 transactions for user 1893 before this transaction to inspect recent merchant countries and timestamps.",
+                "sql": "SELECT transaction_id, transaction_date, amount, merchant_country, ip_country FROM transactions WHERE user_id = 1893 ORDER BY transaction_date DESC LIMIT 5",
+                "row_count": 5,
+                "execution_time_ms": 10,
+                "status": "executed",
+                "note": "Validation passed"
+            }
+        ],
+        "context": {
+            "user_avg_transaction_amount": 77.4,
+            "user_transaction_count_30d": 22,
+            "flagged_by_rules": [
+                "geographic_impossibility"
+            ]
+        },
+        "generated_at": "2026-10-01T20:26:37.697141Z"
+    },
+    "false_negative": {
+        "transaction_id": "1731888d-fe8b-4054-b2c6-adb3e8b8d47a",
+        "status": "completed",
+        "summary": "Agent investigated flagged transaction 1731888d-fe8b-4054-b2c6-adb3e8b8d47a for user 3262. The transaction of 138.71 USD was flagged by [statistical rules]. Historical query examined 5 previous transactions against user average of 321.53. Corroborating behavioral patterns confirm significant divergence from typical activity.",
+        "confidence": 0.75,
+        "queries_run": [
+            {
+                "step": 1,
+                "purpose": "Query the last 5 transactions for user 3262 ordered by date descending to establish baseline behavioral context.",
+                "sql": "SELECT transaction_id, transaction_date, amount, merchant_country, ip_country FROM transactions WHERE user_id = 3262 ORDER BY transaction_date DESC LIMIT 5",
+                "row_count": 5,
+                "execution_time_ms": 13,
+                "status": "executed",
+                "note": "Validation passed"
+            }
+        ],
+        "context": {
+            "user_avg_transaction_amount": 321.53,
+            "user_transaction_count_30d": 18,
+            "flagged_by_rules": []
+        },
+        "generated_at": "2026-10-01T20:26:37.744857Z"
+    }
+}

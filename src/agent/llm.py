@@ -35,7 +35,7 @@ def get_agent_llm() -> Any | None:
         try:
             from langchain_openai import ChatOpenAI
 
-            model = settings.LLM_MODEL if "gpt" in settings.LLM_MODEL else "gpt-4o"
+            model = settings.LLM_MODEL if "gpt" in settings.LLM_MODEL else "gpt-4o-mini"
             return ChatOpenAI(
                 model=model,
                 api_key=settings.OPENAI_API_KEY,
